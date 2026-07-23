@@ -1,0 +1,66 @@
+CREATE DATABASE IF NOT EXISTS WorkSphereDB;
+
+USE WorkSphereDB;
+
+-- Admins Table
+
+CREATE TABLE Admins (
+    AdminId INT PRIMARY KEY AUTO_INCREMENT,
+    FullName VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash VARCHAR(255) NOT NULL,
+    Role VARCHAR(50) NOT NULL DEFAULT 'Admin',
+    IsActive BOOLEAN NOT NULL DEFAULT TRUE,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Departments Table
+
+CREATE TABLE Departments (
+    DepartmentId INT PRIMARY KEY AUTO_INCREMENT,
+    DepartmentName VARCHAR(100) NOT NULL UNIQUE,
+    IsActive BOOLEAN NOT NULL DEFAULT TRUE,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Employees Table
+
+CREATE TABLE Employees (
+
+    EmployeeId INT PRIMARY KEY AUTO_INCREMENT,
+
+    EmployeeCode VARCHAR(20) NOT NULL UNIQUE,
+
+    FullName VARCHAR(100) NOT NULL,
+
+    Email VARCHAR(100) NOT NULL UNIQUE,
+
+    Phone VARCHAR(15),
+
+    DepartmentId INT NOT NULL,
+
+    Designation VARCHAR(100) NOT NULL,
+
+    Salary DECIMAL(10,2) NOT NULL,
+
+    JoiningDate DATE NOT NULL,
+
+    Status ENUM('Active','Inactive')
+        DEFAULT 'Active',
+
+    Photo VARCHAR(255),
+
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT FK_Employee_Department
+        FOREIGN KEY (DepartmentId)
+        REFERENCES Departments(DepartmentId)
+
+);

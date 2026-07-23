@@ -1,8 +1,9 @@
 import { useState } from "react";
-import Navbar from "./Navbar";
-import Sidebar from "./Sidebar";
+import { Outlet } from "react-router-dom";
+import Navbar from "../components/layout/Navbar";
+import Sidebar from "../components/layout/Sidebar";
 
-function MainLayout({ children }) {
+function MainLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="h-screen overflow-hidden bg-gray-100">
@@ -33,7 +34,7 @@ function MainLayout({ children }) {
             lg:p-6
           "
         >
-          {children}
+          <Outlet />
         </main>
 
       </div>
