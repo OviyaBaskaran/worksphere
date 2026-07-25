@@ -18,12 +18,13 @@ ORDER BY e.EmployeeId DESC;
 `;
 
 export const getAllEmployeebyIdQuery = `
-    SELECT 
+    SELECT
         e.EmployeeId,
         e.EmployeeCode,
         e.FullName,
         e.Email,
         e.Phone,
+        e.DepartmentId,
         d.DepartmentName,
         e.Designation,
         e.Salary,

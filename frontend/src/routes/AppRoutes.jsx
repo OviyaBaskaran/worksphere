@@ -4,6 +4,7 @@ import Login from "../pages/Auth/Login";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import EmployeeList from "../pages/Employees/EmployeeList";
 import AddEmployee from "../pages/Employees/AddEmployee";
+import EditEmployee from "../pages/Employees/EditEmployee";
 import Profile from "../pages/Profile/Profile";
 
 import MainLayout from "../layouts/MainLayout";
@@ -27,6 +28,8 @@ function AppRoutes() {
             <Route path="/employees" element={<EmployeeList />} />
 
             <Route path="/employees/add" element={<AddEmployee />} />
+            
+            <Route path="/employees/edit/:id" element={<EditEmployee />}/>
 
             <Route path="/profile" element={<Profile />} />
 

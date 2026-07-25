@@ -1,15 +1,24 @@
 import pool from "../config/db.js";
 
 import {
-  getDashboardSummaryQuery,
+  getDashboardSummaryQuery,getRecentEmployeesQuery
 } from "../sql/dashboardQueries.js";
 
 export async function getDashboardSummaryService() {
 
-  const [rows] = await pool.execute(
+  const [summaryRows] = await pool.execute(
     getDashboardSummaryQuery
   );
 
-  return rows[0];
+
+  const [recentEmployees] = await pool.execute(
+    getRecentEmployeesQuery
+  );
+
+
+  return {
+    ...summaryRows[0],
+    RecentEmployees: recentEmployees,
+  };
 
 }

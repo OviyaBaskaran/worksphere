@@ -7,12 +7,27 @@ export async function getAllEmployees(req, res) {
 
   try {
 
-    const employees = await getAllEmployeesService();
+    const {
+      search,
+      department,
+      status,
+      page,
+      limit,
+    } = req.query;
+
+    const result = await getAllEmployeesService({
+      search,
+      department,
+      status,
+      page,
+      limit,
+    });
 
     return res.status(200).json({
       success: true,
       message: "Employees fetched successfully.",
-      data: employees,
+      data: result.employees,
+      pagination: result.pagination,
     });
 
   } catch (error) {
@@ -67,24 +82,50 @@ export async function createEmployee(req, res) {
 
   try {
 
-    const employeeId = await createEmployeeService(req.body);
+
+    const employeeData = {
+
+      ...req.body,
+
+
+      photo: req.file
+        ? `uploads/employees/${req.file.filename}`
+        : null
+
+    };
+
+
+
+    const employeeId =
+      await createEmployeeService(employeeData);
+
 
 
     return res.status(201).json({
+
       success: true,
+
       message: "Employee created successfully.",
+
       data: {
         EmployeeId: employeeId
       }
+
     });
+
 
 
   } catch(error) {
 
+
     return res.status(500).json({
+
       success: false,
+
       message: error.message,
+
     });
+
 
   }
 
@@ -96,13 +137,11 @@ export async function updateEmployee(req, res) {
 
     const { id } = req.params;
 
-    const result = await updateEmployeeService(
-      id,
-      req.body
-    );
+    // Get existing employee
+    const existingEmployee =
+      await getEmployeeByIdService(id);
 
-
-    if (result === 0) {
+    if (!existingEmployee) {
 
       return res.status(404).json({
         success: false,
@@ -111,15 +150,59 @@ export async function updateEmployee(req, res) {
 
     }
 
+    const employeeData = {
+
+      fullName:
+        req.body.fullName ??
+        existingEmployee.FullName,
+
+      email:
+        req.body.email ??
+        existingEmployee.Email,
+
+      phone:
+        req.body.phone ??
+        existingEmployee.Phone,
+
+      departmentId:
+        req.body.departmentId ??
+        existingEmployee.DepartmentId,
+
+      designation:
+        req.body.designation ??
+        existingEmployee.Designation,
+
+      salary:
+        req.body.salary ??
+        existingEmployee.Salary,
+
+      joiningDate:
+        req.body.joiningDate ??
+        existingEmployee.JoiningDate,
+
+      status:
+        req.body.status ??
+        existingEmployee.Status,
+
+      photo: req.file
+        ? `uploads/employees/${req.file.filename}`
+        : existingEmployee.Photo,
+
+    };
+
+    const result =
+      await updateEmployeeService(
+        id,
+        employeeData
+      );
 
     return res.status(200).json({
       success: true,
       message: "Employee updated successfully.",
       data: {
-        EmployeeId: id
+        EmployeeId: id,
       },
     });
-
 
   } catch (error) {
 

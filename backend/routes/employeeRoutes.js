@@ -1,22 +1,35 @@
 import express from "express";
+import upload from "../middleware/uploadMiddleware.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
-import { 
+
+import {
   getAllEmployees,
   getEmployeeById,
-  createEmployee,updateEmployee,deleteEmployee
+  createEmployee,
+  updateEmployee,
+  deleteEmployee,
 } from "../controllers/employeeController.js";
 
 const router = express.Router();
 
+router.get("/", verifyToken, getAllEmployees);
 
-router.get("/",verifyToken, getAllEmployees);
+router.get("/:id", verifyToken, getEmployeeById);
 
-router.get("/:id",verifyToken, getEmployeeById);
+router.post(
+  "/",
+  verifyToken,
+  upload.single("photo"),
+  createEmployee
+);
 
-router.post("/",verifyToken, createEmployee);
+router.put(
+  "/:id",
+  verifyToken,
+  upload.single("photo"),
+  updateEmployee
+);
 
-router.put("/:id",verifyToken, updateEmployee);
-
-router.delete("/:id",verifyToken, deleteEmployee);
+router.delete("/:id", verifyToken, deleteEmployee);
 
 export default router;
