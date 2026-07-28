@@ -1,292 +1,312 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Table from "../ui/Table";
 import Badge from "../ui/Badge";
 import Avatar from "../ui/Avatar";
-import { useNavigate } from "react-router-dom";
-import { removeEmployee } from "../../services/employeeService";
+import ConfirmDialog from "../ui/ConfirmDialog";
 
+import { removeEmployee } from "../../services/employeeService";
+import {
+  showSuccess,
+  showError,
+} from "../../utils/toast";
 import {
   HiOutlinePencil,
-  HiOutlineTrash
+  HiOutlineTrash,
 } from "react-icons/hi";
 
+function EmployeeTable({
 
-function EmployeeTable({ 
-  
   employees = [],
   showActions = false,
-  onDelete
+  onDelete,
+
 }) {
-const navigate = useNavigate();
-const handleDelete = async (id) => {
 
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this employee?"
-  );
+  const navigate = useNavigate();
 
-  if (!confirmDelete) return;
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  try {
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
 
-    await removeEmployee(id);
+  const handleDelete = async () => {
 
-    if (onDelete) {
-      onDelete();
+    if (!selectedEmployeeId) return;
+
+    try {
+
+      await removeEmployee(selectedEmployeeId);
+
+      showSuccess("Employee deleted successfully.");
+
+      setShowDeleteDialog(false);
+
+      setSelectedEmployeeId(null);
+
+      if (onDelete) {
+
+        onDelete();
+
+      }
+
+    } catch (error) {
+
+      setShowDeleteDialog(false);
+
+      setSelectedEmployeeId(null);
+
+      showError(
+  error.response?.data?.message ||
+  "Failed to delete employee."
+);
+
     }
 
-  } catch (error) {
+  };
 
-    alert(
-      error.response?.data?.message ||
-      "Failed to delete employee"
-    );
+  return (
 
-  }
+    <>
 
-};
-return (
+      <Table>
 
-<Table>
+        <thead>
 
-<thead>
+          <tr
+            className="
+              text-left
+              text-xs
+              text-gray-500
+              uppercase
+            "
+          >
 
-<tr
-className="
-text-left
-text-xs
-text-gray-500
-uppercase
-"
->
+            <th className="px-5 py-3">
+              Employee
+            </th>
 
-<th className="px-5 py-3">
-Employee
-</th>
+            <th className="px-5 py-3">
+              Department
+            </th>
 
+            <th className="px-5 py-3">
+              Designation
+            </th>
 
-<th className="px-5 py-3">
-Department
-</th>
+            {
 
+              showActions && (
 
-<th className="px-5 py-3">
-Designation
-</th>
+                <th className="px-5 py-3">
+                  Salary
+                </th>
 
+              )
 
-{
-showActions && (
+            }
 
-<th className="px-5 py-3">
-Salary
-</th>
+            <th className="px-5 py-3">
+              Status
+            </th>
 
-)
-}
+            {
 
+              showActions && (
 
+                <th className="px-5 py-3">
+                  Actions
+                </th>
 
-<th className="px-5 py-3">
-Status
-</th>
+              )
 
+            }
 
-{
-showActions && (
+          </tr>
 
-<th className="px-5 py-3">
-Actions
-</th>
+        </thead>
 
-)
-}
+        <tbody className="divide-y divide-gray-100">
 
+          {
 
-</tr>
+            employees.length > 0 ? (
 
-</thead>
+              employees.map((employee) => (
 
+                <tr
+                  key={employee.EmployeeId}
+                  className="
+                    hover:bg-gray-50
+                    transition
+                  "
+                >
 
+                  <td className="px-5 py-4">
 
-<tbody className="divide-y divide-gray-100">
+                    <div className="flex items-center gap-3">
 
+                      <Avatar
+                        name={employee.FullName}
+                        image={
+                          employee.Photo
+                            ? `http://localhost:5000/${employee.Photo}`
+                            : null
+                        }
+                      />
 
-{
-employees.length > 0 ? (
+                      <span
+                        className="
+                          text-sm
+                          font-medium
+                          text-gray-800
+                        "
+                      >
 
-employees.map((employee)=>(
+                        {employee.FullName}
 
-<tr
-key={employee.EmployeeId}
-className="
-hover:bg-gray-50
-transition
-"
->
+                      </span>
 
+                    </div>
 
-<td className="px-5 py-4">
+                  </td>
 
-<div className="flex items-center gap-3">
+                  <td className="px-5 py-4 text-sm text-gray-600">
 
-<Avatar
-  name={employee.FullName}
-  image={
-    employee.Photo
-      ? `http://localhost:5000/${employee.Photo}`
-      : null
-  }
-/>
+                    {employee.DepartmentName}
 
+                  </td>
 
-<span className="
-text-sm
-font-medium
-text-gray-800
-">
+                  <td className="px-5 py-4 text-sm text-gray-600">
 
-{employee.FullName}
+                    {employee.Designation}
 
-</span>
+                  </td>
 
+                  {
 
-</div>
+                    showActions && (
 
-</td>
+                      <td className="px-5 py-4 text-sm text-gray-600">
 
+                        ₹{employee.Salary}
 
+                      </td>
 
-<td className="px-5 py-4 text-sm text-gray-600">
+                    )
 
-{employee.DepartmentName}
+                  }
 
-</td>
+                  <td className="px-5 py-4">
 
+                    <Badge status={employee.Status} />
 
+                  </td>
 
-<td className="px-5 py-4 text-sm text-gray-600">
+                  {
 
-{employee.Designation}
+                    showActions && (
 
-</td>
+                      <td className="px-5 py-4">
 
+                        <div className="flex gap-3">
 
+                          <button
+                            onClick={() =>
+                              navigate(`/employees/edit/${employee.EmployeeId}`)
+                            }
+                          >
 
+                            <HiOutlinePencil
+                              size={18}
+                              className="
+                                text-blue-600
+                                hover:text-blue-800
+                              "
+                            />
 
-{
-showActions && (
+                          </button>
 
-<td className="px-5 py-4 text-sm text-gray-600">
+                          <button
+                            onClick={() => {
 
-₹{employee.Salary}
+                              setSelectedEmployeeId(employee.EmployeeId);
 
-</td>
+                              setShowDeleteDialog(true);
 
-)
+                            }}
+                          >
 
-}
+                            <HiOutlineTrash
+                              size={18}
+                              className="
+                                text-red-600
+                                hover:text-red-800
+                              "
+                            />
 
+                          </button>
 
+                        </div>
 
+                      </td>
 
-<td className="px-5 py-4">
+                    )
 
-<Badge status={employee.Status}/>
+                  }
 
-</td>
+                </tr>
 
+              ))
 
+            ) : (
 
+              <tr>
 
-{
-showActions && (
+                <td
+                  colSpan={showActions ? 6 : 4}
+                  className="
+                    py-10
+                    text-center
+                    text-sm
+                    text-gray-400
+                  "
+                >
 
-<td className="px-5 py-4">
+                  No employees found
 
-<div className="flex gap-3">
+                </td>
 
+              </tr>
 
-<button
-  onClick={() =>
-    navigate(`/employees/edit/${employee.EmployeeId}`)
-  }
->
+            )
 
-  <HiOutlinePencil
-    size={18}
-    className="text-blue-600 hover:text-blue-800"
-  />
+          }
 
-</button>
+        </tbody>
 
+      </Table>
 
-<button
-  onClick={() =>
-    handleDelete(employee.EmployeeId)
-  }
->
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="Delete Employee?"
+        message="Are you sure you want to delete this employee? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDelete}
+        onCancel={() => {
 
-<HiOutlineTrash
-  size={18}
-  className="
-    text-red-600
-    hover:text-red-800
-  "
-/>
+          setShowDeleteDialog(false);
 
-</button>
+          setSelectedEmployeeId(null);
 
+        }}
+      />
 
-</div>
+    </>
 
-</td>
-
-)
-
-}
-
-
-</tr>
-
-))
-
-
-)
-
-:
-
-(
-
-<tr>
-
-<td
-colSpan={showActions ? 6 : 4}
-className="
-py-10
-text-center
-text-sm
-text-gray-400
-"
->
-
-No employees found
-
-</td>
-
-</tr>
-
-)
-
-}
-
-
-</tbody>
-
-
-</Table>
-
-)
+  );
 
 }
-
 
 export default EmployeeTable;

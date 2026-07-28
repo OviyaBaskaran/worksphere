@@ -7,11 +7,11 @@ function Card({
 
     <div
       className={`
-        rounded-3xl
+        rounded-xl
         bg-white
         border
         border-gray-100
-        shadow-[0_10px_35px_rgba(0,0,0,0.08)]
+        shadow-sm]
         ${className}
       `}
     >

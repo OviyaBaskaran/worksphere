@@ -5,14 +5,17 @@ export const login = async (formData) => {
   const response = await loginAdmin(formData);
 
   const {
-    token,
-    admin
+    accessToken,
+    admin,
   } = response.data;
 
-  localStorage.setItem("token", token);
+  localStorage.setItem(
+    "token",
+    accessToken
+  );
 
   localStorage.setItem(
-    "admin",
+    "user",
     JSON.stringify(admin)
   );
 

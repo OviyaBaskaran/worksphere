@@ -7,7 +7,10 @@ import Input from "../../components/ui/Input";
 import Select from "../../components/ui/Select";
 import Button from "../../components/ui/Button";
 import Loader from "../../components/ui/Loader";
-
+import {
+  showSuccess,
+  showError,
+} from "../../utils/toast";
 import {
   fetchDepartments
 } from "../../services/departmentService";
@@ -27,7 +30,7 @@ function AddEmployee() {
 
   const [photo, setPhoto] = useState(null);
 
-  const [error, setError] = useState("");
+  
 
 
 
@@ -71,11 +74,11 @@ function AddEmployee() {
     }
     catch(error){
 
-      setError(
-        "Failed to load departments"
-      );
+  showError(
+    "Failed to load departments"
+  );
 
-    }
+}
     finally{
 
       setLoading(false);
@@ -88,17 +91,70 @@ function AddEmployee() {
 
 
 
-  const handlePhotoChange=(e)=>{
+  const handlePhotoChange = (e) => {
 
-    const file=e.target.files[0];
+  const file = e.target.files[0];
 
-    if(file){
 
-      setPhoto(file);
+  if (!file) return;
 
-    }
 
-  };
+
+  // Allowed image types
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/jpg"
+  ];
+
+
+
+  if (!allowedTypes.includes(file.type)) {
+
+    showError(
+      "Only JPG and PNG images are allowed."
+    );
+
+    e.target.value = "";
+
+    return;
+
+  }
+
+
+
+
+  // Maximum size 2MB
+
+  const maxSize = 2 * 1024 * 1024;
+
+
+
+  if (file.size > maxSize) {
+
+    showError(
+      "Image size should be less than 2MB."
+    );
+
+    e.target.value = "";
+
+    return;
+
+  }
+
+
+
+
+  setPhoto(file);
+
+
+  showSuccess(
+    "Image uploaded successfully."
+  );
+
+
+};
 
 
 
@@ -181,6 +237,9 @@ function AddEmployee() {
 
 
       await addEmployee(formData);
+      showSuccess(
+  "Employee added successfully."
+);
 
 
       navigate("/employees");
@@ -189,12 +248,13 @@ function AddEmployee() {
     }
     catch(error){
 
-      setError(
-        error.response?.data?.message ||
-        "Failed to create employee"
-      );
+  const message =
+    error.response?.data?.message ||
+    "Failed to create employee.";
 
-    }
+  showError(message);
+
+}
 
   };
 

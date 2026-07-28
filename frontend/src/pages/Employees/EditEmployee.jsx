@@ -16,6 +16,10 @@ import {
   fetchEmployeeById,
   editEmployee,
 } from "../../services/employeeService";
+import {
+  showSuccess,
+  showError,
+} from "../../utils/toast";
 
 function EditEmployee() {
 
@@ -119,11 +123,15 @@ function EditEmployee() {
     }
     catch (error) {
 
-      setError(
-        "Failed to load employee"
-      );
+  const message =
+    error.response?.data?.message ||
+    "Failed to load employee.";
 
-    }
+  setError(message);
+
+  showError(message);
+
+}
     finally {
 
       setLoading(false);
@@ -132,99 +140,162 @@ function EditEmployee() {
 
   };
 
-  const handlePhotoChange = (e) => {
+const handlePhotoChange = (e) => {
 
-    const file = e.target.files[0];
+  const file = e.target.files[0];
 
-    if (file) {
 
-      setPhoto(file);
+  if (!file) {
+    return;
+  }
 
-      setPhotoPreview(
-        URL.createObjectURL(file)
+
+  // Check image type
+
+  if (
+    file.type !== "image/png" &&
+    file.type !== "image/jpeg" &&
+    file.type !== "image/jpg"
+  ) {
+
+    showError(
+      "Only JPG and PNG images are allowed."
+    );
+
+    e.target.value = null;
+
+    return;
+
+  }
+
+
+
+  // Check image size (2MB)
+
+  if (file.size > 2 * 1024 * 1024) {
+
+    showError(
+      "Image size should be less than 2MB."
+    );
+
+    e.target.value = null;
+
+    return;
+
+  }
+
+
+
+  setPhoto(file);
+
+
+  // For EditEmployee preview
+
+  if (setPhotoPreview) {
+
+    setPhotoPreview(
+      URL.createObjectURL(file)
+    );
+
+  }
+
+};
+
+const onSubmit = async (data) => {
+
+  try {
+
+    const formData = new FormData();
+
+
+    formData.append(
+      "employeeCode",
+      data.EmployeeCode
+    );
+
+    formData.append(
+      "fullName",
+      data.FullName
+    );
+
+    formData.append(
+      "email",
+      data.Email
+    );
+
+    formData.append(
+      "phone",
+      data.Phone || ""
+    );
+
+    formData.append(
+      "departmentId",
+      data.DepartmentId
+    );
+
+    formData.append(
+      "designation",
+      data.Designation
+    );
+
+    formData.append(
+      "salary",
+      data.Salary
+    );
+
+    formData.append(
+      "joiningDate",
+      data.JoiningDate
+    );
+
+    formData.append(
+      "status",
+      data.Status
+    );
+
+
+    if(photo){
+
+      formData.append(
+        "photo",
+        photo
       );
 
     }
 
-  };
 
-  const onSubmit = async (data) => {
 
-    try {
+    await editEmployee(
+      id,
+      formData
+    );
 
-      const formData = new FormData();
 
-      formData.append(
-        "employeeCode",
-        data.EmployeeCode
-      );
+    showSuccess(
+      "Employee updated successfully."
+    );
 
-      formData.append(
-        "fullName",
-        data.FullName
-      );
 
-      formData.append(
-        "email",
-        data.Email
-      );
+    navigate("/employees");
 
-      formData.append(
-        "phone",
-        data.Phone || ""
-      );
 
-      formData.append(
-        "departmentId",
-        data.DepartmentId
-      );
+  }
+  catch(error){
 
-      formData.append(
-        "designation",
-        data.Designation
-      );
 
-      formData.append(
-        "salary",
-        data.Salary
-      );
+    const message =
 
-      formData.append(
-        "joiningDate",
-        data.JoiningDate
-      );
+      error.response?.data?.message ||
 
-      formData.append(
-        "status",
-        data.Status
-      );
+      "Failed to update employee.";
 
-      if (photo) {
 
-        formData.append(
-          "photo",
-          photo
-        );
+    showError(message);
 
-      }
-            await editEmployee(
-        id,
-        formData
-      );
 
-      navigate("/employees");
+  }
 
-    }
-    catch (error) {
-
-      setError(
-        error.response?.data?.message ||
-        "Failed to update employee"
-      );
-
-    }
-
-  };
+};
 
   if (loading) {
 

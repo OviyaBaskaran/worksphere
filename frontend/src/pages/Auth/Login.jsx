@@ -1,16 +1,25 @@
 import { useState } from "react";
-import { login } from "../../services/authService";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
+import {
+  HiOutlineEye,
+  HiOutlineEyeOff,
+} from "react-icons/hi";
 
+import { login } from "../../services/authService";
 import { loginSuccess } from "../../store/authSlice";
 
 import Logo from "../../components/common/Logo";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Card from "../../components/ui/Card";
+
+import {
+  showSuccess,
+  showError,
+} from "../../utils/toast";
 
 
 function Login() {
@@ -21,79 +30,102 @@ function Login() {
   const navigate = useNavigate();
 
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword,setShowPassword] =
+    useState(false);
 
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-
-  const [error, setError] = useState("");
+  const [loading,setLoading] =
+    useState(false);
 
 
 
+  const {
+    register,
+    handleSubmit,
+    formState:{
+      errors
+    }
+  } = useForm();
 
-  const handleChange = (e) => {
+const handleValidationError = (errors) => {
 
-    setFormData({
+  if(errors.email){
 
-      ...formData,
+    showError(
+      "Please enter email."
+    );
 
-      [e.target.name]: e.target.value,
+    return;
 
-    });
-
-  };
-
-
-
-
-
-  const handleLogin = async (e) => {
-
-    e.preventDefault();
-
-    setError("");
-
-    try {
+  }
 
 
-      const response = await login(formData);
+  if(errors.password){
+
+    showError(
+      "Please enter password."
+    );
+
+    return;
+
+  }
+
+};
+
+  const handleLogin = async(data)=>{
 
 
-      console.log(
-        "LOGIN RESPONSE:",
-        response
-      );
+    try{
+
+      setLoading(true);
+
+
+      const response =
+  await login(data);
 
 
 
-     dispatch(
+dispatch(
+
   loginSuccess({
-    user: response.data.admin,
-    token: response.data.token,
+
+    user:
+      response.data.admin,
+
+    token:
+      response.data.accessToken,
+
   })
+
 );
 
+
+
+      showSuccess(
+        "Login successful."
+      );
 
 
       navigate("/dashboard");
 
 
+    }
+    catch(error){
 
-    } 
-    catch (err) {
 
+      showError(
 
-      setError(
+        error.response?.data?.message ||
 
-        err.response?.data?.message ||
-        "Login Failed"
+        "Invalid email or password."
 
       );
 
+
+    }
+    finally{
+
+      setLoading(false);
 
     }
 
@@ -102,38 +134,37 @@ function Login() {
 
 
 
-
-
   return (
 
-    <div className="
-      min-h-screen
-      bg-[#f7f8fc]
-      flex
-      items-center
-      justify-center
-      px-4
-      sm:px-6
-      lg:px-8
-    ">
+    <div
+      className="
+        min-h-screen
+        bg-[#f7f8fc]
+        flex
+        items-center
+        justify-center
+        px-4
+      "
+    >
 
 
-      <Card className="
-        w-full
-        max-w-md
-        p-6
-        sm:p-8
-      ">
+      <Card
+        className="
+          w-full
+          max-w-md
+          p-6
+          sm:p-8
+        "
+      >
 
 
-
-        {/* Logo */}
-
-        <div className="
-          flex
-          justify-center
-          mb-6
-        ">
+        <div
+          className="
+            flex
+            justify-center
+            mb-6
+          "
+        >
 
           <Logo />
 
@@ -141,57 +172,53 @@ function Login() {
 
 
 
-
-
-        {/* Login Form */}
-
         <form
-          onSubmit={handleLogin}
+          onSubmit={
+            handleSubmit(handleLogin,handleValidationError)
+          }
           className="space-y-5"
         >
 
 
 
+          <Input
 
-          {/* Email */}
+            label="Email Address"
 
-          <div>
+            type="email"
 
-            <Input
+            placeholder="Enter your email"
 
-              label="Email Address"
+            error={
+              errors.email?.message
+            }
 
-              type="email"
+            {...register(
+              "email",
+              {
+                required:
+                "Email is required"
+              }
+            )}
 
-              name="email"
-
-              value={formData.email}
-
-              onChange={handleChange}
-
-              placeholder="Enter your email"
-
-            />
-
-          </div>
-
+          />
 
 
 
 
-
-          {/* Password */}
 
           <div>
 
 
-            <label className="
-              block
-              text-sm
-              font-medium
-              text-gray-700
-              mb-2
-            ">
+            <label
+              className="
+                block
+                text-sm
+                font-medium
+                text-gray-700
+                mb-2
+              "
+            >
 
               Password
 
@@ -199,9 +226,9 @@ function Login() {
 
 
 
-
-            <div className="relative">
-
+            <div
+              className="relative"
+            >
 
               <input
 
@@ -211,13 +238,8 @@ function Login() {
                   : "password"
                 }
 
-                name="password"
-
-                value={formData.password}
-
-                onChange={handleChange}
-
                 placeholder="Enter your password"
+
 
                 className="
                   w-full
@@ -229,17 +251,19 @@ function Login() {
                   py-2.5
                   pr-12
                   outline-none
-                  transition-all
-                  duration-200
                   focus:border-orange-500
-                  focus:bg-white
-                  focus:ring-4
-                  focus:ring-orange-100
                 "
 
+
+                {...register(
+                  "password",
+                  {
+                    required:
+                    "Password is required"
+                  }
+                )}
+
               />
-
-
 
 
 
@@ -247,9 +271,9 @@ function Login() {
 
                 type="button"
 
-                onClick={() =>
-                  setShowPassword(!showPassword)
-                }
+                onClick={()=>setShowPassword(
+                  !showPassword
+                )}
 
                 className="
                   absolute
@@ -257,24 +281,25 @@ function Login() {
                   top-1/2
                   -translate-y-1/2
                   text-xl
-                  text-gray-500
-                  hover:text-orange-500
                 "
 
               >
 
-
                 {
                   showPassword
+
                   ?
-                  <HiOutlineEyeOff />
+
+                  <HiOutlineEyeOff/>
+
                   :
-                  <HiOutlineEye />
+
+                  <HiOutlineEye/>
+
                 }
 
 
               </button>
-
 
 
             </div>
@@ -282,119 +307,41 @@ function Login() {
 
 
 
-
             {
-              error && (
+              errors.password &&
 
-                <p className="
+              <p
+                className="
                   text-sm
                   text-red-500
-                  text-center
                   mt-2
-                ">
+                "
+              >
 
-                  {error}
+                {
+                  errors.password.message
+                }
 
-                </p>
+              </p>
 
-              )
             }
 
 
-
           </div>
 
 
 
 
 
-
-
-          {/* Remember Me & Forgot Password */}
-
-          <div className="
-            flex
-            items-center
-            justify-between
-          ">
-
-
-            <label className="
-              flex
-              items-center
-              gap-2
-              text-sm
-              text-gray-600
-              cursor-pointer
-            ">
-
-
-              <input
-
-                type="checkbox"
-
-                className="
-                  h-4
-                  w-4
-                  accent-orange-500
-                "
-
-              />
-
-
-              Remember me
-
-
-            </label>
-
-
-
-
-
-            <button
-
-              type="button"
-
-              className="
-                text-sm
-                font-medium
-                text-orange-500
-                hover:text-orange-600
-                hover:underline
-              "
-
-            >
-
-              Forgot Password?
-
-            </button>
-
-
-
-          </div>
-
-
-
-
-
-
-
-          {/* Login Button */}
-
-          <Button
-
-            type="submit"
-
-            fullWidth
-
-          >
-
-            Login
-
-
-          </Button>
-
-
+          <div className="flex justify-center">
+  <Button
+    type="submit"
+    disabled={loading}
+    className="px-10"
+  >
+    {loading ? "Signing in..." : "Login"}
+  </Button>
+</div>
 
 
 
@@ -404,20 +351,18 @@ function Login() {
 
 
 
-
-        {/* Footer */}
-
-        <p className="
-          mt-8
-          text-center
-          text-xs
-          text-gray-400
-        ">
+        <p
+          className="
+            mt-8
+            text-center
+            text-xs
+            text-gray-400
+          "
+        >
 
           © 2026 WorkSphere. All Rights Reserved.
 
         </p>
-
 
 
 
@@ -427,6 +372,7 @@ function Login() {
     </div>
 
   );
+
 
 }
 

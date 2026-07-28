@@ -1,7 +1,10 @@
-import { getAllEmployeesService,
+import {
+  getAllEmployeesService,
   getEmployeeByIdService,
   createEmployeeService,
-  updateEmployeeService,deleteEmployeeService } from "../services/employeeService.js";
+  updateEmployeeService,
+  deleteEmployeeService,
+} from "../services/employeeService.js";
 
 export async function getAllEmployees(req, res) {
 
@@ -47,8 +50,8 @@ export async function getEmployeeById(req, res) {
 
     const { id } = req.params;
 
-    const employee = await getEmployeeByIdService(id);
-
+    const employee =
+      await getEmployeeByIdService(id);
 
     if (!employee) {
 
@@ -59,13 +62,11 @@ export async function getEmployeeById(req, res) {
 
     }
 
-
     return res.status(200).json({
       success: true,
       message: "Employee fetched successfully.",
       data: employee,
     });
-
 
   } catch (error) {
 
@@ -82,24 +83,18 @@ export async function createEmployee(req, res) {
 
   try {
 
-
     const employeeData = {
 
       ...req.body,
 
-
       photo: req.file
         ? `uploads/employees/${req.file.filename}`
-        : null
+        : null,
 
     };
 
-
-
     const employeeId =
       await createEmployeeService(employeeData);
-
-
 
     return res.status(201).json({
 
@@ -108,15 +103,12 @@ export async function createEmployee(req, res) {
       message: "Employee created successfully.",
 
       data: {
-        EmployeeId: employeeId
-      }
+        EmployeeId: employeeId,
+      },
 
     });
 
-
-
-  } catch(error) {
-
+  } catch (error) {
 
     return res.status(500).json({
 
@@ -125,7 +117,6 @@ export async function createEmployee(req, res) {
       message: error.message,
 
     });
-
 
   }
 
@@ -137,7 +128,6 @@ export async function updateEmployee(req, res) {
 
     const { id } = req.params;
 
-    // Get existing employee
     const existingEmployee =
       await getEmployeeByIdService(id);
 
@@ -196,19 +186,38 @@ export async function updateEmployee(req, res) {
         employeeData
       );
 
+    if (result === 0) {
+
+      return res.status(404).json({
+
+        success: false,
+
+        message: "Employee not found.",
+
+      });
+
+    }
+
     return res.status(200).json({
+
       success: true,
+
       message: "Employee updated successfully.",
+
       data: {
         EmployeeId: id,
       },
+
     });
 
   } catch (error) {
 
     return res.status(500).json({
+
       success: false,
+
       message: error.message,
+
     });
 
   }
@@ -221,32 +230,41 @@ export async function deleteEmployee(req, res) {
 
     const { id } = req.params;
 
-    const result = await deleteEmployeeService(id);
-
+    const result =
+      await deleteEmployeeService(id);
 
     if (result === 0) {
 
       return res.status(404).json({
+
         success: false,
+
         message: "Employee not found.",
+
       });
 
     }
 
-
     return res.status(200).json({
+
       success: true,
+
       message: "Employee deleted successfully.",
+
       data: {
         EmployeeId: id,
       },
+
     });
 
   } catch (error) {
 
     return res.status(500).json({
+
       success: false,
+
       message: error.message,
+
     });
 
   }

@@ -53,50 +53,96 @@ export async function loginAdminService(loginData) {
 
   const { email, password } = loginData;
 
+
   if (!email || !password) {
     throw new Error("Email and Password are required.");
   }
+
 
   const [admins] = await pool.execute(
     FIND_ADMIN_BY_EMAIL,
     [email]
   );
 
+
   if (admins.length === 0) {
     throw new Error("Invalid Email or Password.");
   }
 
+
   const admin = admins[0];
+
 
   const isPasswordValid = await bcrypt.compare(
     password,
     admin.PasswordHash
   );
 
+
   if (!isPasswordValid) {
     throw new Error("Invalid Email or Password.");
   }
 
-  const token = jwt.sign(
+
+
+  // Access Token (30 Minutes)
+
+  const accessToken = jwt.sign(
+
     {
       adminId: admin.AdminId,
       email: admin.Email,
       role: admin.Role,
     },
+
     process.env.JWT_SECRET,
+
     {
-      expiresIn: "1d",
+      expiresIn:"30m",
     }
+
   );
 
-  return {
-    message: "Login Successful",
-    token,
-    admin: {
+
+
+  // Refresh Token (7 Days)
+
+  const refreshToken = jwt.sign(
+
+    {
       adminId: admin.AdminId,
-      fullName: admin.FullName,
-      email: admin.Email,
-      role: admin.Role,
     },
+
+    process.env.JWT_REFRESH_SECRET,
+
+    {
+      expiresIn: "7d",
+    }
+
+  );
+
+
+
+  return {
+
+    message: "Login Successful",
+
+    accessToken,
+
+    refreshToken,
+
+    admin: {
+
+      adminId: admin.AdminId,
+
+      fullName: admin.FullName,
+
+      email: admin.Email,
+
+      role: admin.Role,
+
+    },
+
   };
+
 }

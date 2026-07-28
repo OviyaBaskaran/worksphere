@@ -1,7 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 import authReducer from "./authSlice";
-
+import searchReducer from "./searchSlice";
+import loaderReducer from "./loaderSlice";
 
 const store = configureStore({
 
@@ -9,9 +10,12 @@ const store = configureStore({
 
     auth: authReducer,
 
+    search: searchReducer,
+
+    loader: loaderReducer,
+
   },
 
 });
-
 
 export default store;
