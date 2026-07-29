@@ -4,7 +4,6 @@ import GlobalLoader from "./components/common/GlobalLoader";
 function App() {
   return (
     <>
-      <GlobalLoader />
       <AppRoutes />
     </>
   );

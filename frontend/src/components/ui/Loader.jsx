@@ -1,9 +1,14 @@
 function Loader() {
-
   return (
-
-    <div className="flex items-center justify-center py-10">
-
+    <div
+      className="
+        flex
+        items-center
+        justify-center
+        min-h-[60vh]
+        w-full
+      "
+    >
       <div
         className="
           h-10
@@ -15,11 +20,8 @@ function Loader() {
           border-t-orange-500
         "
       />
-
     </div>
-
   );
-
 }
 
 export default Loader;

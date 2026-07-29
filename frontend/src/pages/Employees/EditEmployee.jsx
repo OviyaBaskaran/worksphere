@@ -114,11 +114,11 @@ function EditEmployee() {
 
       if (employee.Photo) {
 
-        setPhotoPreview(
-          `http://localhost:5000/${employee.Photo}`
-        );
+  setPhotoPreview(
+    `${import.meta.env.VITE_API_URL.replace("/api", "")}/${employee.Photo}`
+  );
 
-      }
+}
 
     }
     catch (error) {

@@ -101,13 +101,11 @@ function Profile() {
 
 
 
-      if(data.Photo){
-
-        setPreview(
-          `http://localhost:5000/${data.Photo}`
-        );
-
-      }
+      if (data.Photo) {
+  setPreview(
+    `${import.meta.env.VITE_API_URL.replace("/api", "")}/${data.Photo}`
+  );
+}
 
 
     }

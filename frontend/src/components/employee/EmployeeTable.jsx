@@ -149,10 +149,10 @@ function EmployeeTable({
                       <Avatar
                         name={employee.FullName}
                         image={
-                          employee.Photo
-                            ? `http://localhost:5000/${employee.Photo}`
-                            : null
-                        }
+  employee.Photo
+    ? `${import.meta.env.VITE_API_URL.replace("/api", "")}/${employee.Photo}`
+    : null
+}
                       />
 
                       <span
