@@ -115,7 +115,9 @@ function EditEmployee() {
       if (employee.Photo) {
 
   setPhotoPreview(
-    `${import.meta.env.VITE_API_URL.replace("/api", "")}/${employee.Photo}`
+    employee.Photo.startsWith("http")
+      ? employee.Photo
+      : `${import.meta.env.VITE_API_URL.replace("/api", "")}/${employee.Photo}`
   );
 
 }

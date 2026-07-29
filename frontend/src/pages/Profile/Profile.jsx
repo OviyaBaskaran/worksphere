@@ -101,9 +101,11 @@ function Profile() {
 
 
 
-      if (data.Photo) {
+     if (data.Photo) {
   setPreview(
-    `${import.meta.env.VITE_API_URL.replace("/api", "")}/${data.Photo}`
+    data.Photo.startsWith("http")
+      ? data.Photo
+      : `${import.meta.env.VITE_API_URL.replace("/api", "")}/${data.Photo}`
   );
 }
 

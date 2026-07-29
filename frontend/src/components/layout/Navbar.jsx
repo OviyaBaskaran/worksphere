@@ -216,25 +216,12 @@ function Navbar({
 
     "Administrator";
 
-  const userPhoto =
-
-    user?.Photo
-
-      ?
-
-      user.Photo.startsWith("http")
-
-        ?
-
-        user.Photo
-
-        :
-
-        `http://localhost:5000/${user.Photo}`
-
-      :
-
-      null;
+const userPhoto =
+  user?.Photo
+    ? user.Photo.startsWith("http")
+      ? user.Photo
+      : `${import.meta.env.VITE_API_URL.replace("/api", "")}/${user.Photo}`
+    : null;
 
   return (
 

@@ -88,8 +88,8 @@ export async function createEmployee(req, res) {
       ...req.body,
 
       photo: req.file
-        ? `uploads/employees/${req.file.filename}`
-        : null,
+  ? req.file.path
+  : null,
 
     };
 
@@ -175,8 +175,8 @@ export async function updateEmployee(req, res) {
         existingEmployee.Status,
 
       photo: req.file
-        ? `uploads/employees/${req.file.filename}`
-        : existingEmployee.Photo,
+  ? req.file.path
+  : existingEmployee.Photo,
 
     };
 

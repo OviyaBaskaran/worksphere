@@ -150,7 +150,9 @@ function EmployeeTable({
                         name={employee.FullName}
                         image={
   employee.Photo
-    ? `${import.meta.env.VITE_API_URL.replace("/api", "")}/${employee.Photo}`
+    ? employee.Photo.startsWith("http")
+      ? employee.Photo
+      : `${import.meta.env.VITE_API_URL.replace("/api", "")}/${employee.Photo}`
     : null
 }
                       />
