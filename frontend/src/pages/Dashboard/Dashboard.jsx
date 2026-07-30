@@ -6,7 +6,7 @@ import Loader from "../../components/ui/Loader";
 import EmployeeTable from "../../components/employee/EmployeeTable";
 
 import { fetchDashboardSummary } from "../../services/dashboardService";
-
+import { useNavigate } from "react-router-dom";
 
 // React Icons
 import {
@@ -22,7 +22,7 @@ function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadDashboard();
@@ -244,15 +244,16 @@ function Dashboard() {
 
 
           <button
-            className="
-              text-sm
-              text-orange-500
-              hover:text-orange-600
-              font-medium
-            "
-          >
-            View All
-          </button>
+  onClick={() => navigate("/employees")}
+  className="
+    text-sm
+    text-orange-500
+    hover:text-orange-600
+    font-medium
+  "
+>
+  View All
+</button>
 
 
         </div>

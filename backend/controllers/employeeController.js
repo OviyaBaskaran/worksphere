@@ -6,6 +6,17 @@ import {
   deleteEmployeeService,
 } from "../services/employeeService.js";
 
+const phoneNumberPattern = /^\d{10,15}$/;
+
+function hasValidPhoneNumber(phone) {
+  return (
+    phone === undefined ||
+    phone === null ||
+    phone === "" ||
+    (typeof phone === "string" && phoneNumberPattern.test(phone))
+  );
+}
+
 export async function getAllEmployees(req, res) {
 
   try {
@@ -83,6 +94,13 @@ export async function createEmployee(req, res) {
 
   try {
 
+    if (!hasValidPhoneNumber(req.body.phone)) {
+      return res.status(400).json({
+        success: false,
+        message: "Phone number must contain 10 to 15 digits only.",
+      });
+    }
+
     const employeeData = {
 
       ...req.body,
@@ -127,6 +145,13 @@ export async function updateEmployee(req, res) {
   try {
 
     const { id } = req.params;
+
+    if (!hasValidPhoneNumber(req.body.phone)) {
+      return res.status(400).json({
+        success: false,
+        message: "Phone number must contain 10 to 15 digits only.",
+      });
+    }
 
     const existingEmployee =
       await getEmployeeByIdService(id);

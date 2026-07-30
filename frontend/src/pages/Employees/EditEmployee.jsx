@@ -556,7 +556,20 @@ const onSubmit = async (data) => {
 
               placeholder="Enter phone number"
 
-              {...register("Phone")}
+              type="tel"
+
+              inputMode="numeric"
+
+              maxLength={15}
+
+              error={errors.Phone?.message}
+
+              {...register("Phone", {
+                pattern: {
+                  value: /^\d{10,15}$/,
+                  message: "Phone number must contain 10 to 15 digits only",
+                },
+              })}
 
             />
 
